@@ -1,0 +1,81 @@
+{
+  "run_hash": "711386c9b89b",
+  "created_utc": "2026-06-12T06:32:00.313710+00:00",
+  "dataset": "synthetic",
+  "config": {
+    "dataset": "synthetic",
+    "ingest": {
+      "synthetic": {
+        "n_channels": 8,
+        "sfreq": 128,
+        "minutes": 20,
+        "seed": 7,
+        "states": [
+          "alpha",
+          "beta",
+          "theta",
+          "delta",
+          "mixed"
+        ]
+      }
+    },
+    "preprocess": {
+      "l_freq": 0.5,
+      "h_freq": 45.0,
+      "notch": 50.0,
+      "reject_amplitude_uv": 250.0
+    },
+    "window": {
+      "seconds": 2.0,
+      "overlap": 0.5
+    },
+    "embed": {
+      "backend": "handcrafted",
+      "standardize": true
+    },
+    "reduce": {
+      "method": "umap",
+      "n_components": 2,
+      "umap": {
+        "n_neighbors": 15,
+        "min_dist": 0.1,
+        "metric": "cosine",
+        "seed": 42
+      }
+    },
+    "novelty": {
+      "k": 15
+    },
+    "index": {
+      "metric": "cosine"
+    }
+  },
+  "data_fingerprint": "ce345d359a080f5c",
+  "n_windows": 1199,
+  "embedding_dim": 72,
+  "window_shape": [
+    8,
+    256
+  ],
+  "sfreq": 128.0,
+  "channel_names": [
+    "EEG00",
+    "EEG01",
+    "EEG02",
+    "EEG03",
+    "EEG04",
+    "EEG05",
+    "EEG06",
+    "EEG07"
+  ],
+  "labels": [
+    "alpha",
+    "beta",
+    "delta",
+    "mixed",
+    "theta"
+  ],
+  "versions": {
+    "python": "3.12.3"
+  }
+}

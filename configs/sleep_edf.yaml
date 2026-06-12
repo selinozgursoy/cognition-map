@@ -1,0 +1,36 @@
+# Sleep-EDF Expanded (PhysioNet) — labeled sleep stages. Clean, well-separated
+# clusters, so it's the best real dataset to prove the map on actual EEG.
+# First run downloads ~10 MB per recording via MNE into ~/mne_data.
+# Data: PhysioNet Open Access (Open Data Commons). Cite Kemp et al. 2000.
+
+dataset: sleep_edf
+
+ingest:
+  sleep_edf:
+    subject: 0              # 0..82 in the age study; try 0, 1, 2 ...
+    recording: 1            # night 1 or 2
+    channels: ["EEG Fpz-Cz", "EEG Pz-Oz"]
+    crop_margin_min: 30     # keep 30 min of wake either side of the sleep period
+
+preprocess:
+  l_freq: 0.5
+  h_freq: 30.0             # sleep staging lives below 30 Hz
+  notch: null              # already low-passed below mains; nothing to notch
+  reject_amplitude_uv: 500.0   # deep-sleep slow waves are large; don't over-reject
+
+window:
+  seconds: 30.0            # sleep is scored in 30 s epochs by convention
+  overlap: 0.0
+  drop_unlabeled: true     # skip unscored gaps so they don't form a junk cluster
+
+embed:
+  backend: handcrafted
+  standardize: true
+
+reduce:
+  method: umap
+  n_components: 2
+  umap: { n_neighbors: 30, min_dist: 0.1, metric: cosine, seed: 42 }
+
+novelty: { k: 20 }
+index:  { metric: cosine }

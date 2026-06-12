@@ -1,0 +1,171 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap");
+
+/* ---- design tokens --------------------------------------------------------
+   Deep observatory palette. Background is slate, not pure black, so the spectral
+   point colors read as signal against a calm field. Type: Space Grotesk for the
+   instrument voice, Inter for prose, JetBrains Mono for every measured value. */
+:root {
+  --bg: #0b0e14;
+  --bg-2: #10141d;
+  --panel: #131825;
+  --panel-2: #171d2c;
+  --line: #232b3d;
+  --line-soft: #1b2230;
+  --ink: #e6e9f0;
+  --ink-dim: #8b93a7;
+  --ink-faint: #5d6577;
+  --accent: #38b2b8;          /* teal = alpha band, the resting reference rhythm */
+  --accent-warm: #e0a83c;
+  --focus: #f0f4fc;
+  --display: "Space Grotesk", system-ui, sans-serif;
+  --body: "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+.mono { font-family: var(--mono); font-size: 12px; }
+.dim { color: var(--ink-dim); }
+
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ---- topbar --------------------------------------------------------------- */
+.topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--bg-2), var(--bg));
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 26px; height: 26px; border-radius: 50%;
+  /* a spectral sweep: the whole idea in one mark */
+  background: conic-gradient(from 220deg, #6e56cf, #3874de, #26b2b8, #e0a83c, #e8605c, #6e56cf);
+  box-shadow: 0 0 0 1px var(--line), 0 0 18px rgba(56, 178, 184, 0.25);
+}
+.topbar h1 { font-family: var(--display); font-size: 16px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+.topbar .sub { margin: 0; font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; justify-self: center; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-dim); }
+.run-meta { color: var(--ink-faint); }
+
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.dot.sm { width: 7px; height: 7px; margin-right: 6px; }
+
+/* ---- layout --------------------------------------------------------------- */
+.layout { display: grid; grid-template-columns: 1fr 380px; flex: 1; min-height: 0; }
+.canvas-col { position: relative; display: flex; flex-direction: column; border-right: 1px solid var(--line); }
+.map-wrap { position: relative; flex: 1; min-height: 0; background: radial-gradient(circle at 50% 40%, #0e1320, var(--bg) 70%); }
+.lasso-overlay { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; }
+
+/* ---- controls bar --------------------------------------------------------- */
+.controls {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-top: 1px solid var(--line); background: var(--bg-2);
+}
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.seg button, .toggle {
+  font-family: var(--mono); font-size: 12px; color: var(--ink-dim);
+  background: transparent; border: none; padding: 7px 12px; cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button.on { background: var(--panel-2); color: var(--ink); }
+.toggle { border: 1px solid var(--line); border-radius: 7px; }
+.toggle.on { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+.seg button:focus-visible, .toggle:focus-visible, .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+/* ---- inspector ------------------------------------------------------------ */
+.inspector { background: var(--bg-2); overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.inspector-block { background: var(--panel); border: 1px solid var(--line-soft); border-radius: 10px; padding: 12px; }
+.inspector-block.accent { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(56, 178, 184, 0.2); }
+.block-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.kicker { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+.pill { font-family: var(--mono); font-size: 11px; padding: 1px 7px; border-radius: 20px; background: var(--panel-2); color: var(--ink-dim); border: 1px solid var(--line); }
+.pill.sm { font-size: 10px; padding: 0 6px; }
+.empty, .error-state { color: var(--ink-faint); font-size: 13px; padding: 24px; text-align: center; }
+.error-state { font-family: var(--mono); color: var(--accent-warm); }
+
+/* ---- traces + spectrogram ------------------------------------------------- */
+.traces { display: block; background: #0a0d14; border-radius: 8px; }
+.trace-line { fill: none; stroke: #26b2b8; stroke-width: 0.7; opacity: 0.9; }
+.trace-label { fill: var(--ink-faint); font-family: var(--mono); font-size: 6px; }
+.spec-block { margin-top: 10px; }
+.spec-caption { font-family: var(--mono); font-size: 10px; color: var(--ink-faint); margin-bottom: 4px; }
+.spec-canvas { width: 100%; height: 90px; image-rendering: pixelated; border-radius: 8px; background: #0a0d14; }
+
+/* ---- search results ------------------------------------------------------- */
+.result-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.result-list li { display: grid; grid-template-columns: auto auto auto 1fr auto; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px; cursor: pointer; }
+.result-list li:hover { background: var(--panel-2); }
+.bar { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-warm)); }
+
+/* ---- explain table -------------------------------------------------------- */
+.explain-line { font-size: 12px; color: var(--ink-dim); margin: 0 0 8px; line-height: 1.5; }
+.explain-line b { color: var(--ink); font-weight: 500; }
+.explain-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.explain-table th { text-align: right; font-weight: 500; color: var(--ink-faint); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 6px; }
+.explain-table th:first-child, .explain-table td:first-child { text-align: left; }
+.explain-table td { text-align: right; padding: 3px 6px; border-top: 1px solid var(--line-soft); }
+
+/* ---- band profile + label assistant --------------------------------------- */
+.band-profile { display: flex; flex-direction: column; gap: 5px; margin: 8px 0; }
+.band-row { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 8px; }
+.band-name { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); }
+.band-track { height: 7px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.band-bar { display: block; height: 100%; }
+.suggestion { margin-bottom: 8px; }
+.name-input { width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; color: var(--ink); font-family: var(--display); font-size: 15px; font-weight: 500; padding: 8px 10px; }
+.rationale { font-size: 12px; color: var(--ink-dim); line-height: 1.5; margin: 8px 0 0; }
+.row { display: flex; align-items: center; }
+.row.gap { gap: 8px; }
+.btn { font-family: var(--mono); font-size: 12px; padding: 8px 14px; border-radius: 7px; cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 500; }
+.btn.ghost { color: var(--ink-dim); }
+
+.tip { font-family: var(--mono); font-size: 12px; background: var(--panel); color: var(--ink); padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---- guide button + panel ------------------------------------------------- */
+.run-meta { display: flex; align-items: center; gap: 12px; }
+.guide-btn {
+  font-family: var(--mono); font-size: 11px; color: var(--accent);
+  background: transparent; border: 1px solid var(--line); border-radius: 6px;
+  padding: 4px 10px; cursor: pointer;
+}
+.guide-btn:hover { background: var(--panel-2); }
+.guide-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+.guide-backdrop {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(6, 9, 14, 0.72);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.guide-panel {
+  width: min(560px, 100%); max-height: 84vh; overflow-y: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 22px 24px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.guide-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.guide-head h2 { font-family: var(--display); font-size: 18px; font-weight: 600; margin: 0; }
+.guide-close { background: transparent; border: none; color: var(--ink-dim); font-size: 24px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.guide-close:hover { color: var(--ink); }
+.guide-panel section { margin-top: 18px; }
+.guide-panel h3 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin: 0 0 10px; }
+.guide-panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.guide-states li { display: grid; grid-template-columns: auto 64px 1fr; align-items: baseline; gap: 10px; }
+.guide-controls li { display: grid; grid-template-columns: 96px 1fr; gap: 10px; }
+.guide-name { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+.guide-def { font-size: 13px; color: var(--ink-dim); line-height: 1.5; }
+.guide-notes li { font-size: 13px; color: var(--ink-dim); line-height: 1.5; padding-left: 14px; position: relative; }
+.guide-notes li::before { content: "·"; position: absolute; left: 4px; color: var(--accent); }

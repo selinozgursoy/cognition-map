@@ -1,0 +1,46 @@
+# A run is fully defined by this file. The pipeline hashes it together with the
+# input data to produce a run_hash, so every map is traceable to exactly how it
+# was made. Copy this file, change values, and you have a new reproducible run.
+
+dataset: synthetic            # "synthetic" runs with zero downloads. See pipeline/ingest.py
+                              # for how to swap in Sleep-EDF / PhysioNet via MNE.
+
+ingest:
+  # Only used when dataset == synthetic. Generates EEG with known oscillatory
+  # "states" so the map has real, checkable structure on first run.
+  synthetic:
+    n_channels: 8
+    sfreq: 128                # Hz
+    minutes: 20               # total recording length
+    seed: 7
+    # each state = a dominant frequency band held for a stretch of time
+    states: [alpha, beta, theta, delta, mixed]
+
+preprocess:
+  l_freq: 0.5                 # high-pass (Hz): drifts below this are removed
+  h_freq: 45.0               # low-pass (Hz): noise above this is removed
+  notch: 50.0                # mains hum (use 60.0 in North America); null to skip
+  reject_amplitude_uv: 250.0 # windows with any sample beyond +/- this are dropped
+
+window:
+  seconds: 2.0               # length of one window = one point on the map
+  overlap: 0.5               # fractional overlap between consecutive windows
+
+embed:
+  backend: handcrafted       # handcrafted | foundation  (foundation = EEGPT/LaBraM, see embed.py)
+  standardize: true          # z-score features across windows so no single feature dominates
+
+reduce:
+  method: umap               # umap | pca | tsne
+  n_components: 2            # 2 for the canvas; set 3 for a 3D map
+  umap:
+    n_neighbors: 15          # smaller = more local structure, larger = more global
+    min_dist: 0.1
+    metric: cosine
+    seed: 42
+
+novelty:
+  k: 15                      # a window's novelty = its mean distance to k nearest neighbours
+
+index:
+  metric: cosine             # cosine matches "similar states"; vectors are L2-normalised

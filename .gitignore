@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node / Vite
+web/node_modules/
+web/dist/
+web/package-lock.json
+
+# Artifacts: keep structure, ignore large generated runs.
+# Commit a small sample run deliberately if you want a zero-setup demo.
+artifacts/*/*/windows.npy
+artifacts/*/*/embeddings.npy
+artifacts/*/*/index.faiss
+artifacts/*/*/reducer.joblib
+
+.DS_Store
+.env

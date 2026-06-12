@@ -1,0 +1,34 @@
+# EEG Motor Movement/Imagery (PhysioNet) — labeled motor-imagery states.
+# 64-channel EEG at 160 Hz. Runs 4/8/12 = imagine left vs right fist.
+# First run downloads a few MB per run via MNE into ~/mne_data.
+# Data: PhysioNet Open Access. Cite Schalk et al. 2004 (BCI2000).
+
+dataset: eegbci
+
+ingest:
+  eegbci:
+    subject: 1             # 1..109
+    runs: [4, 8, 12]       # imagined left/right fist
+
+preprocess:
+  l_freq: 1.0
+  h_freq: 40.0             # sensorimotor mu/beta rhythms sit here
+  notch: 60.0              # US mains
+  reject_amplitude_uv: 200.0
+
+window:
+  seconds: 2.0
+  overlap: 0.5
+  drop_unlabeled: false    # "rest" is the default label; nothing is unlabeled
+
+embed:
+  backend: handcrafted
+  standardize: true
+
+reduce:
+  method: umap
+  n_components: 2
+  umap: { n_neighbors: 15, min_dist: 0.1, metric: cosine, seed: 42 }
+
+novelty: { k: 15 }
+index:  { metric: cosine }
