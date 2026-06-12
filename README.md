@@ -61,7 +61,3 @@ see [ROADMAP.md](./ROADMAP.md).
 ## Stack
 
 MNE-Python · UMAP · FAISS · FastAPI · React · Deck.gl
-
-## License
-
-MIT
