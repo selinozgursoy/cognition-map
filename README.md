@@ -55,8 +55,7 @@ python -m pipeline.run_pipeline --config configs/eegbci.yaml      # real motor i
 ```
 
 Each config is self-describing — edit the subject, channels, or window length and
-re-run to get a new, fully reproducible map. To plug in a pretrained EEG encoder,
-see [ROADMAP.md](./ROADMAP.md).
+re-run to get a new, fully reproducible map. 
 
 ## Stack
 
